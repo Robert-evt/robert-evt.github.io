@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            color: #fff;
+            border: none;
+        }
+        .button-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .order-button {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .order-button.active {
+            background-color: #4caf50;
+            cursor: pointer;
+        }
+        .plus, .minus {
+            padding: 5px 10px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .plus {
+            background-color: #4caf50;
+        }
+        .minus {
+            background-color: #f44336;
+        }
+        .product-button, .one-time-button {
+            font-size: 18px;
+            color: #000;
+            cursor: not-allowed;
+            background-color: #e0e0e0;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .controls div {
+            margin: 0 10px;
+        }
+        .counter {
+            font-size: 18px;
+            margin: 0 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .basket-item {
+            text-align: left;
+            margin: 10px 0;
+        }
+        #reset-buttons {
+            margin-top: 10px;
+        }
+        #reset-button, #next-button {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+        }
+        #reset-button {
+            background-color: #000;
+        }
+        #next-button {
+            background-color: #000;
+        }
+        #next-button.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #wait-time {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+        .role-button {
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+        }
+        .role-button-cook {
+            background-color: red;
+        }
+        .role-button-customer {
+            background-color: green;
+        }
+        #confirmation {
+            text-align: center;
+        }
+        #confirmation-buttons {
+            margin-top: 10px;
+        }
+        #confirmation-buttons button {
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        #confirmation-buttons button#yes-button {
+            background-color: #4caf50;
+            color: #fff;
+        }
+        #confirmation-buttons button#no-button {
+            background-color: #f44336;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="role-buttons">
+            <button class="role-button role-button-cook" id="cook-button">Повар</button>
+            <button class="role-button role-button-customer" id="customer-button">Покупатель</button>
+        </div>
+        <h1 id="title">Выберите продукт</h1>
+        <div id="order-form">
+            <div class="product-controls">
+                <button class="button product-button" id="smoothie-button" disabled>🍹 Смузи</button>
+                <div class="controls">
+                    <button class="button minus" id="smoothie-minus">-</button>
+                    <div class="counter" id="smoothie-counter">0</div>
+                    <button class="button plus" id="smoothie-plus">+</button>
+                </div>
+            </div>
+            <div class="product-controls">
+                <button class="button product-button" id="salad-button" disabled>🥗 Салат</button>
+                <div class="controls">
+                    <button class="button minus" id="salad-minus">-</button>
+                    <div class="counter" id="salad-counter">0</div>
+                    <button class="button plus" id="salad-plus">+</button>
+                </div>
+            </div>
+            <div class="product-controls">
+                <button class="button one-time-button" id="wash-dishes-button">🍴 Помыть посуду</button>
+                <button class="button one-time-button" id="make-lunch-button">🍲 Приготовить обед</button>
+                <button class="button one-time-button" id="reading-button">📖 Чтение</button>
+            </div>
+            <button class="button order-button" id="order-button" disabled>Заказать</button>
+        </div>
+        <div id="basket" class="hidden">
+            <div id="basket-items"></div>
+            <div id="wait-time" class="hidden"></div>
+            <div id="reset-buttons">
+                <button class="button" id="reset-button">←</button>
+                <button class="button" id="next-button">Заказ получен</button>
+            </div>
+        </div>
+        <div id="confirmation" class="hidden">
+            <h2>Спасибо за заказ хотите заказать ещё что-то?</h2>
+            <div id="confirmation-buttons">
+                <button id="yes-button">Да, ещё кое-что</button>
+                <button id="no-button">Нет, Спасибо</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const smoothiePlus = document.getElementById('smoothie-plus');
+        const smoothieMinus = document.getElementById('smoothie-minus');
+        const smoothieCounter = document.getElementById('smoothie-counter');
+        
+        const saladPlus = document.getElementById('salad-plus');
+        const saladMinus = document.getElementById('salad-minus');
+        const saladCounter = document.getElementById('salad-counter');
+
+        const orderButton = document.getElementById('order-button');
+        const title = document.getElementById('title');
+        const orderForm = document.getElementById('order-form');
+        const basket = document.getElementById('basket');
+        const basketItems = document.getElementById('basket-items');
+        const resetButton = document.getElementById('reset-button');
+        const nextButton = document.getElementById('next-button');
+        const waitTime = document.getElementById('wait-time');
+
+        const washDishesButton = document.getElementById('wash-dishes-button');
+        const makeLunchButton = document.getElementById('make-lunch-button');
+        const readingButton = document.getElementById('reading-button');
+
+        const cookButton = document.getElementById('cook-button');
+        const customerButton = document.getElementById('customer-button');
+
+        const confirmation = document.getElementById('confirmation');
+        const yesButton = document.getElementById('yes-button');
+        const noButton = document.getElementById('no-button');
+
+        let smoothieCount = 0;
+        let saladCount = 0;
+        let dishesWashed = false;
+        let lunchMade = false;
+        let readingDone = false;
+
+        cookButton.addEventListener('click', () => {
+            cookButton.classList.add('role-button-customer');
+            cookButton.classList.remove('role-button-cook');
+            customerButton.classList.add('role-button-cook');
+            customerButton.classList.remove('role-button-customer');
+        });
+
+        customerButton.addEventListener('click', () => {
+            customerButton.classList.add('role-button-customer');
+            customerButton.classList.remove('role-button-cook');
+            cookButton.classList.add('role-button-cook');
+            cookButton.classList.remove('role-button-customer');
+        });
+
+        function updateOrderButtonState() {
+            if (smoothieCount > 0 || saladCount > 0 || dishesWashed || lunchMade || readingDone) {
+                orderButton.classList.add('active');
+                orderButton.disabled = false;
+            } else {
+                orderButton.classList.remove('active');
+                orderButton.disabled = true;
+            }
+        }
+
+        smoothiePlus.addEventListener('click', () => {
+            smoothieCount++;
+            smoothieCounter.textContent = smoothieCount;
+            updateOrderButtonState();
+        });
+
+        smoothieMinus.addEventListener('click', () => {
+            if (smoothieCount > 0) {
+                smoothieCount--;
+                smoothieCounter.textContent = smoothieCount;
+                updateOrderButtonState();
+            }
+        });
+
+        saladPlus.addEventListener('click', () => {
+            saladCount++;
+            saladCounter.textContent = saladCount;
+            updateOrderButtonState();
+        });
+
+        saladMinus.addEventListener('click', () => {
+            if (saladCount > 0) {
+                saladCount--;
+                saladCounter.textContent = saladCount;
+                updateOrderButtonState();
+            }
+        });
+
+        washDishesButton.addEventListener('click', () => {
+            dishesWashed = true;
+            updateOrderButtonState();
+        });
+
+        makeLunchButton.addEventListener('click', () => {
+            lunchMade = true;
+            updateOrderButtonState();
+        });
+
+        readingButton.addEventListener('click', () => {
+            readingDone = true;
+            updateOrderButtonState();
+        });
+
+        orderButton.addEventListener('click', () => {
+            const order = {
+                smoothie: smoothieCount,
+                salad: saladCount,
+                dishesWashed,
+                lunchMade,
+                readingDone
+            };
+
+            fetch('https://your-webhook-url.com', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(order)
+            })
+            .then(response => {
+                if (response.ok) {
+                    basket.classList.remove('hidden');
+                    orderForm.classList.add('hidden');
+                    basketItems.innerHTML = `
+                        <p>Смузи: ${smoothieCount}</p>
+                        <p>Салат: ${saladCount}</p>
+                        <p>Помыть посуду: ${dishesWashed ? 'Да' : 'Нет'}</p>
+                        <p>Приготовить обед: ${lunchMade ? 'Да' : 'Нет'}</p>
+                        <p>Чтение: ${readingDone ? 'Да' : 'Нет'}</p>
+                    `;
+                    const waitTimeValue = Math.floor(Math.random() * 6) + 3;
+                    waitTime.textContent = `Ваш заказ будет готов через ${waitTimeValue} минут(ы)`;
+                    waitTime.classList.remove('hidden');
+                    nextButton.classList.remove('disabled');
+                } else {
+                    alert('Ошибка при отправке заказа');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка при отправке заказа');
+            });
+        });
+
+        resetButton.addEventListener('click', () => {
+            orderForm.classList.remove('hidden');
+            basket.classList.add('hidden');
+            confirmation.classList.add('hidden');
+            smoothieCount = 0;
+            saladCount = 0;
+            dishesWashed = false;
+            lunchMade = false;
+            readingDone = false;
+            smoothieCounter.textContent = smoothieCount;
+            saladCounter.textContent = saladCount;
+            updateOrderButtonState();
+        });
+
+        nextButton.addEventListener('click', () => {
+            basket.classList.add('hidden');
+            confirmation.classList.remove('hidden');
+        });
+
+        yesButton.addEventListener('click', () => {
+            confirmation.classList.add('hidden');
+            orderForm.classList.remove('hidden');
+        });
+
+        noButton.addEventListener('click', () => {
+            confirmation.classList.add('hidden');
+            window.location.href = 'https://hook.us1.make.com/ib5v8jmtpmo8ypl4xaicsw1y2t6ssoec';
+        });
+    </script>
+</body>
+</html>
