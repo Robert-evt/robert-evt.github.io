@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+HTML:<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -189,16 +189,16 @@
         function updateBasket() {
             basketItems.innerHTML = '';
             if (smoothieCount > 0) {
-                basketItems.innerHTML += `<div class="basket-item">🍹 Смузи: ${smoothieCount}</div>`;
+                basketItems.innerHTML += <div class="basket-item">🍹 Смузи: ${smoothieCount}</div>;
             }
             if (saladCount > 0) {
-                basketItems.innerHTML += `<div class="basket-item">🥗 Салат: ${saladCount}</div>`;
+                basketItems.innerHTML += <div class="basket-item">🥗 Салат: ${saladCount}</div>;
             }
             if (dishesWashed) {
-                basketItems.innerHTML += `<div class="basket-item">🍴 Помыть посуду: Выполнено</div>`;
+                basketItems.innerHTML += <div class="basket-item">🍴 Помыть посуду: Выполняется</div>;
             }
             if (lunchMade) {
-                basketItems.innerHTML += `<div class="basket-item">🍲 Приготовить обед: Выполнено</div>`;
+                basketItems.innerHTML += <div class="basket-item">🍲 Приготовить обед: Выполняется</div>;
             }
         }
 
@@ -292,7 +292,7 @@
             alert('Заказ сделан');
             const totalWaitTime = calculateWaitTime();
             title.textContent = 'Ждите примерно';
-            waitTime.textContent = `Примерное время ожидания: ${totalWaitTime} минут${totalWaitTime > 1 ? 'ы' : ''}.`;
+            waitTime.textContent = Примерное время ожидания: ${totalWaitTime} минут${totalWaitTime > 1 ? 'ы' : ''}.;
             waitTime.classList.remove('hidden');
             nextButton.classList.add('disabled');
             nextButton.textContent = '→';
